@@ -1,5 +1,7 @@
 from fastapi import FastAPI, UploadFile, HTTPException
 from azure.storage.blob import BlobServiceClient
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.cors import CORSMiddleware
 import psycopg2
 import os
 
@@ -48,3 +50,29 @@ async def download_file(folder_name: str, file_name: str):
         return {"file_content": stream.readall()}
     except Exception as e:
         raise HTTPException(status_code=404, detail=str(e))
+
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["<frontend-url>"],  # Replace with your Azure Static Web App URL
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+@app.get("/files")
+async def list_files():
+    cursor.execute("SELECT * FROM file_metadata")
+    files = cursor.fetchall()
+    file_list = [
+        {
+            "id": row[0],
+            "name": row[1],
+            "type": row[2],
+            "size": row[3],
+            "folder": row[4],
+            "uploaded_at": row[5],
+        }
+        for row in files
+    ]
+    return {"files": file_list}
+
