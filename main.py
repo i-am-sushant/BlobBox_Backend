@@ -53,7 +53,7 @@ async def download_file(folder_name: str, file_name: str):
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["<frontend-url>"],  # Replace with your Azure Static Web App URL
+    allow_origins=["https://calm-dune-01a642f03.4.azurestaticapps.net"],  # Replace with your Azure Static Web App URL
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
