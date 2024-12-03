@@ -1,1 +1,4 @@
-fastapi uvicorn azure-storage-blob psycopg2-binary
+fastapi 
+uvicorn 
+azure-storage-blob 
+psycopg2-binary
