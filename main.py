@@ -14,22 +14,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-@app.get("/files")
-async def list_files():
-    cursor.execute("SELECT * FROM file_metadata")
-    files = cursor.fetchall()
-    file_list = [
-        {
-            "id": row[0],
-            "name": row[1],
-            "type": row[2],
-            "size": row[3],
-            "folder": row[4],
-            "uploaded_at": row[5],
-        }
-        for row in files
-    ]
-    return {"files": file_list}
+
 
 # Load configuration from environment variables
 BLOB_CONN_STR = os.getenv("BLOB_CONN_STR")
@@ -42,6 +27,17 @@ container_name = "project-uploads"
 # Connect to PostgreSQL
 conn = psycopg2.connect(POSTGRES_CONN_STR)
 cursor = conn.cursor()
+
+@app.get("/files")
+async def list_files():
+    try:
+        # Code to list files from the Blob storage container
+        blob_list = blob_service_client.get_container_client(container_name).list_blobs()
+        files = [blob.name for blob in blob_list]
+        return {"files": files}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 
 @app.post("/upload/{folder_name}")
 async def upload_file(folder_name: str, file: UploadFile):
