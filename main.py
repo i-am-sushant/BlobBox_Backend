@@ -6,6 +6,31 @@ import os
 
 app = FastAPI()
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["https://calm-dune-01a642f03.4.azurestaticapps.net"],  # Replace with your Azure Static Web App URL
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+@app.get("/files")
+async def list_files():
+    cursor.execute("SELECT * FROM file_metadata")
+    files = cursor.fetchall()
+    file_list = [
+        {
+            "id": row[0],
+            "name": row[1],
+            "type": row[2],
+            "size": row[3],
+            "folder": row[4],
+            "uploaded_at": row[5],
+        }
+        for row in files
+    ]
+    return {"files": file_list}
+
 # Load configuration from environment variables
 BLOB_CONN_STR = os.getenv("BLOB_CONN_STR")
 POSTGRES_CONN_STR = os.getenv("POSTGRES_CONN_STR")
@@ -51,27 +76,6 @@ async def download_file(folder_name: str, file_name: str):
         raise HTTPException(status_code=404, detail=str(e))
 
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["https://calm-dune-01a642f03.4.azurestaticapps.net"],  # Replace with your Azure Static Web App URL
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-@app.get("/files")
-async def list_files():
-    cursor.execute("SELECT * FROM file_metadata")
-    files = cursor.fetchall()
-    file_list = [
-        {
-            "id": row[0],
-            "name": row[1],
-            "type": row[2],
-            "size": row[3],
-            "folder": row[4],
-            "uploaded_at": row[5],
-        }
-        for row in files
-    ]
-    return {"files": file_list}
+
+
 
