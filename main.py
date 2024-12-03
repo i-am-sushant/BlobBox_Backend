@@ -1,7 +1,6 @@
 from fastapi import FastAPI, UploadFile, HTTPException
 from azure.storage.blob import BlobServiceClient
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.middleware.cors import CORSMiddleware
 import psycopg2
 import os
 
